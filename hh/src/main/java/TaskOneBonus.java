@@ -1,10 +1,5 @@
-import java.sql.PreparedStatement;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class TaskOneBonus {
 
@@ -81,33 +76,49 @@ public class TaskOneBonus {
      */
 
     private static Integer accountNumbers = 4;
-    private static Integer managers = 100;
-//    private static Integer managers = 6;
-//    private static List<Integer> listAccountValues = Arrays.asList(199, 453, 220, 601);
-    private static List<Integer> listAccountValues = Arrays.asList(98, 1);
+//    private static Integer managers = 100;
+//    private static List<Integer> listAccountValues = Arrays.asList(98, 1);
+
+    private static Integer managers = 6;
+    private static List<Integer> listAccountValues = Arrays.asList(199, 453, 220, 601);
 
     public static void main(String[] args) {
-        try {int avgValue = avg(listAccountValues, managers);
-            for (int i = 0; i < managers; avgValue--){
-                Integer bonus = getBouns(listAccountValues, avgValue);
-                if (bonus.equals(managers)) {
-                    System.out.println(avgValue);
-                    break;
-                }
-            }
+        try {
+            int maxPossibleBonus = getMaxPossibleBonus(listAccountValues, managers);
+            getBonus(listAccountValues, maxPossibleBonus);
         } catch (ArithmeticException e) {
             System.out.println(0);
         }
-
-
     }
 
-    private static Integer avg(List<Integer> listAccountValues, Integer managers){
+    /**
+     * Максимально возможная премия
+     * @param listAccountValues
+     * @param managers
+     * @return
+     */
+    private static Integer getMaxPossibleBonus(List<Integer> listAccountValues, Integer managers){
         Integer sum = listAccountValues.stream().mapToInt(Integer::intValue).sum();
         return sum / managers;
     }
 
-    private static Integer getBouns(List<Integer> listAccountValues, Integer avg){
-        return (listAccountValues.stream().map(e -> (e / avg)).mapToInt(Integer::intValue).sum());
+    /**
+     * Количество транзакций со счетов
+     * @param listAccountValues
+     * @param maxPossibleBonus
+     * @return
+     */
+    private static Integer getTransactionsQty(List<Integer> listAccountValues, Integer maxPossibleBonus){
+        return listAccountValues.stream().map(e -> (e / maxPossibleBonus)).mapToInt(Integer::intValue).sum();
+    }
+
+    private static void getBonus(List<Integer> listAccountValues, Integer maxPossibleBonus){
+        for (int i = 0; i < managers; maxPossibleBonus--){
+            Integer bonus = getTransactionsQty(listAccountValues, maxPossibleBonus);
+            if (bonus.equals(managers)) {
+                System.out.println(maxPossibleBonus);
+                break;
+            }
+        }
     }
 }
