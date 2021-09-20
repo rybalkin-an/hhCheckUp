@@ -1,14 +1,16 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
+import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
-public class TaskOneBonus {
+public class Main {
 
     /**
      * Условие задачи
      *
      * Ограничение времени, с	1
-     * Ограничение памяти, МБ	64
+     * Ограничение памяти, МБ
      * Общее число попыток отправки	15
      *
      * Петр Васильевич, директор ОАО "Рога и рога", собирается раздать премию всем менеджерам компании, он добрый и
@@ -77,37 +79,27 @@ public class TaskOneBonus {
      */
 
     public static void main(String[] args) {
-        Integer accountNumbers = 0;
-        Integer managers = 0;
-        List<Integer> listAccountValues = new ArrayList<>();
+        Long accountNumbers = 100000L;
+        Long managers = 100000L;
+        List<Long> listAccountValues = new ArrayList<>();
 
-        Scanner reader = new Scanner(System.in);
+        listAccountValues = getList(accountNumbers);
 
-        accountNumbers = Integer.parseInt(reader.nextLine());
-        managers = Integer.parseInt(reader.nextLine());
 
-        while (listAccountValues.size() < accountNumbers) {
-            String input = reader.nextLine();
-            listAccountValues.add(Integer.parseInt(input));
-        }
+//        Scanner reader = new Scanner(System.in);
+//
+//        accountNumbers = reader.nextInt();
+//        managers = reader.nextInt();
+//
+//        while (listAccountValues.size() < accountNumbers) {
+//            listAccountValues.add(reader.nextInt());
+//        }
 
         try {
-            int maxPossibleBonus = getMaxPossibleBonus(listAccountValues, managers);
-            getBonus(listAccountValues, maxPossibleBonus, managers);
+            System.out.println(binSearch(listAccountValues, managers));
         } catch (ArithmeticException e) {
-            System.out.println(0);
+            System.out.println("Ebobo");
         }
-    }
-
-    /**
-     *
-     * @param listAccountValues
-     * @param managers
-     * @return Максимально возможная премия
-     */
-    private static Integer getMaxPossibleBonus(List<Integer> listAccountValues, Integer managers){
-        Integer sum = listAccountValues.stream().mapToInt(Integer::intValue).sum();
-        return sum / managers;
     }
 
     /**
@@ -116,17 +108,51 @@ public class TaskOneBonus {
      * @param maxPossibleBonus
      * @return Количество транзакций со счетов при максимально возможной премии
      */
-    private static Integer getTransactionsQty(List<Integer> listAccountValues, Integer maxPossibleBonus){
-        return listAccountValues.stream().map(e -> (e / maxPossibleBonus)).mapToInt(Integer::intValue).sum();
+    private static Long getTransactionsQty(List<Long> listAccountValues, Long maxPossibleBonus){
+        return listAccountValues.stream()
+                .map(e -> (e / maxPossibleBonus))
+                .mapToLong(Long::longValue)
+                .sum();
     }
 
-    private static void getBonus(List<Integer> listAccountValues, Integer maxPossibleBonus, Integer managers){
-        for (int i = 0; i < managers; maxPossibleBonus--){
-            Integer bonus = getTransactionsQty(listAccountValues, maxPossibleBonus);
-            if (bonus.equals(managers)) {
-                System.out.println(maxPossibleBonus);
-                break;
+    private static Long getSumAccountValue(List<Long> listAccountValues){
+        return listAccountValues.stream().reduce(0L, Long::sum);
+    }
+
+    private static Long binSearch(List<Long> listAccountValues, Long managers){
+        long low = 2;
+        Long high = getSumAccountValue(listAccountValues) / managers;
+        while (low < high - 1) {
+            Long mid = (low + high) / 2;
+            Long midResult = getTransactionsQty(listAccountValues, mid);
+            if (midResult < managers) {
+                high = mid;
+            } else if (midResult > managers) {
+                low = mid;
+            } else {
+                if (getTransactionsQty(listAccountValues, mid + 1).equals(managers)){
+                    low = mid;
+                } else return mid;
             }
+        }
+        return null;
+    }
+
+    private static List <Long> getList(Long numOfElements){
+        return LongStream.range(1, numOfElements + 1)
+                .mapToObj(x -> (long) randInt(1, 100000000))
+                .collect(Collectors.toList());
+    }
+
+    private static int randInt(int min, int max) {
+        Random random = new Random();
+        return random.nextInt((max - min) + 1) + min;
+    }
+
+    private static Long noBonusCase(List<Long> listAccountValues, Long managers){
+        Long sum = getSumAccountValue(listAccountValues);
+        if (sum < managers) {
+            return 0L;
         }
     }
 }
