@@ -1,4 +1,5 @@
 import org.junit.jupiter.api.Test;
+import task1.Main;
 
 import java.util.Arrays;
 import java.util.List;
