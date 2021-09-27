@@ -6,7 +6,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class Tests {
+public class Task1Tests {
 
     @Test
     void test1(){
